@@ -31,5 +31,5 @@ resource FeatureFlag {
 # oso-cloud list OktaUser:larry read FeatureFlag
 
 ## Coming soon: context
-# oso-cloud tell has_role OktaGroup:InfrastructureEngineering maintainer FeatureFlag:1
+# oso-cloud tell has_role 'OktaGroup:Infrastructure Engineering' maintainer FeatureFlag:1
 # oso-cloud authorize OktaUser:larry read FeatureFlag:1 -c 'has_group OktaUser:larry OktaGroup:InfrastructureEngineering'

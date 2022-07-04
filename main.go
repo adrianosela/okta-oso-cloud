@@ -19,15 +19,25 @@ func (ou OktaUser) Type() string    { return "OktaUser" }
 func (og OktaGroup) Type() string   { return "OktaGroup" }
 func (ff FeatureFlag) Type() string { return "FeatureFlag" }
 
+func groupListToBulkFact(userID string, groupIDs ...string) []oso.BulkFact {
+	bf := []oso.BulkFact{}
+	for _, groupID := range groupIDs {
+		bf = append(bf, oso.BulkFact{
+			Predicate: "has_group",
+			Args:      []oso.Instance{OktaUser{id: userID}, OktaGroup{id: groupID}},
+		})
+	}
+	return bf
+}
+
 func main() {
+	// mock data
+	oktaUserID := "larry"
+	oktaGroupIDs := []string{"Infrastructure Engineering", "Everyone", "Internal Tools"}
+
 	osoClient := oso.NewClient("https://cloud.osohq.com", os.Getenv("OSO_AUTH"))
 
-	allowed, err := osoClient.AuthorizeWithContext(OktaUser{id: "larry"}, "read", FeatureFlag{id: "1"}, []oso.BulkFact{
-		{
-			Predicate: "has_group",
-			Args:      []oso.Instance{OktaUser{id: "larry"}, OktaGroup{id: "InfrastructureEngineering"}},
-		},
-	})
+	allowed, err := osoClient.AuthorizeWithContext(OktaUser{id: oktaUserID}, "read", FeatureFlag{id: "1"}, groupListToBulkFact(oktaUserID, oktaGroupIDs...))
 	if err != nil {
 		log.Fatal(err)
 	}
